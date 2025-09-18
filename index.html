@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe de Progreso - Diplomado G2037</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* slate-900 */
+        }
+        .card {
+            background-color: #1e293b; /* slate-800 */
+            border: 1px solid #334155; /* slate-700 */
+            border-radius: 0.75rem;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .progress-circle {
+            transition: stroke-dashoffset 0.5s ease-in-out;
+        }
+        .modal-backdrop {
+            background-color: rgba(0,0,0,0.7);
+        }
+    </style>
+</head>
+<body class="text-white">
+
+    <!-- Pantalla de Selección de Estudiante -->
+    <div id="selection-screen" class="min-h-screen flex flex-col items-center justify-center p-4">
+        <div class="w-full max-w-lg text-center">
+            <svg class="mx-auto h-12 w-auto text-sky-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h1 class="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">Informe de Progreso del Diplomado</h1>
+            <p class="mt-2 text-lg text-slate-400">Fecha del Reporte: 17 de septiembre de 2025</p>
+            
+            <div class="mt-8 space-y-4 text-left p-8 bg-slate-800 rounded-xl shadow-2xl border border-slate-700">
+                <div>
+                    <label for="student-select" class="block text-sm font-medium text-slate-300">Selecciona tu nombre completo:</label>
+                    <select id="student-select" class="mt-1 block w-full bg-slate-900 border border-slate-600 rounded-md shadow-sm py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        <option value="">-- Cargando estudiantes... --</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="password-input" class="block text-sm font-medium text-slate-300">Contraseña:</label>
+                    <input type="password" id="password-input" class="mt-1 block w-full bg-slate-900 border border-slate-600 rounded-md shadow-sm py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Ingresa la contraseña para ver tu ficha">
+                </div>
+                 <div id="error-message" class="text-red-400 text-sm font-medium hidden"></div>
+                <button id="view-report-btn" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-4 rounded-md transition duration-300 shadow-lg">
+                    Ver Mi Progreso
+                </button>
+            </div>
+             <div class="mt-6 text-xs text-slate-500 flex justify-center space-x-4">
+                <a href="#" id="coord-link" class="hover:underline">Reporte de Coordinación</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla de Reporte Individual -->
+    <div id="report-screen" class="hidden min-h-screen p-4 sm:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h2 id="student-name" class="text-3xl font-bold tracking-tight"></h2>
+                    <p id="student-email" class="text-slate-400"></p>
+                    <p class="text-slate-400 mt-2">Este es tu estado actual en el diplomado. ¡Sigue esforzándote!</p>
+                </div>
+                <button id="back-btn" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-md transition duration-300 flex-shrink-0">
+                    &larr; Volver
+                </button>
+            </div>
+
+            <!-- Mensaje General Dinámico -->
+            <div id="general-message-box" class="px-4 py-3 rounded-lg relative mb-8" role="alert">
+              <strong id="general-message-title" class="font-bold"></strong>
+              <span id="general-message-text" class="block sm:inline"></span>
+            </div>
+
+            <!-- Grid de Análisis -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Eje Técnico -->
+                <div class="card p-6 col-span-1 md:col-span-2 lg:col-span-1">
+                    <h3 class="text-lg font-bold text-sky-400">Eje Técnico</h3>
+                    <p class="text-sm text-slate-400 mb-4">Actividades Entregables</p>
+                    <div class="flex items-center space-x-4">
+                         <div id="tech-progress" class="w-16 h-16"></div>
+                        <div>
+                            <p id="tech-status" class="text-xl font-bold"></p>
+                            <p id="tech-activities" class="text-slate-300"></p>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-slate-700">
+                        <p class="text-sm font-semibold mb-1">Análisis:</p>
+                        <p id="tech-analysis" class="text-sm text-slate-300"></p>
+                    </div>
+                </div>
+
+                <!-- Inglés Técnico -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-bold text-teal-400">Inglés Técnico</h3>
+                    <p class="text-sm text-slate-400 mb-4">Actividades Entregables</p>
+                    <div class="flex items-center space-x-4">
+                        <div id="english-progress" class="w-16 h-16"></div>
+                        <div>
+                            <p id="english-status" class="text-xl font-bold"></p>
+                            <p id="english-activities" class="text-slate-300"></p>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-slate-700">
+                        <p class="text-sm font-semibold mb-1">Análisis:</p>
+                        <p id="english-analysis" class="text-sm text-slate-300"></p>
+                    </div>
+                </div>
+
+                <!-- Asistencia -->
+                 <div class="card p-6">
+                    <h3 class="text-lg font-bold text-violet-400">Asistencia</h3>
+                    <p class="text-sm text-slate-400 mb-4">Porcentaje de Sesiones</p>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative w-16 h-16">
+                            <svg class="w-full h-full" viewBox="0 0 36 36">
+                                <path d="M18 2.0845
+                                  a 15.9155 15.9155 0 0 1 0 31.831
+                                  a 15.9155 15.9155 0 0 1 0 -31.831"
+                                  fill="none"
+                                  stroke="#334155"
+                                  stroke-width="3" />
+                                <path id="attendance-circle"
+                                  class="progress-circle"
+                                  d="M18 2.0845
+                                  a 15.9155 15.9155 0 0 1 0 31.831
+                                  a 15.9155 15.9155 0 0 1 0 -31.831"
+                                  fill="none"
+                                  stroke="#8b5cf6"
+                                  stroke-width="3"
+                                  stroke-dasharray="100, 100"
+                                  stroke-dashoffset="100"
+                                  stroke-linecap="round" />
+                            </svg>
+                             <div class="absolute inset-0 flex items-center justify-center">
+                                <span id="attendance-percent" class="text-lg font-bold"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <p id="attendance-status" class="text-xl font-bold"></p>
+                             <p id="attendance-sessions" class="text-slate-300"></p>
+                        </div>
+                    </div>
+                     <div class="mt-4 pt-4 border-t border-slate-700">
+                        <p class="text-sm font-semibold mb-1">Análisis:</p>
+                        <p id="attendance-analysis" class="text-sm text-slate-300"></p>
+                    </div>
+                </div>
+
+                <!-- Habilidades de Poder -->
+                <div class="card p-6 bg-slate-800/50 opacity-70">
+                    <h3 class="text-lg font-bold text-slate-500">Habilidades de Poder</h3>
+                    <p class="text-sm text-slate-400 mb-4">Próximamente</p>
+                     <div class="flex items-center space-x-4 text-slate-500">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="text-lg font-bold">Aún no se han solicitado entregables.</p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-slate-700">
+                        <p class="text-sm text-slate-300">Mantente atento a las próximas comunicaciones sobre este módulo.</p>
+                    </div>
+                </div>
+
+                <!-- Proyecto Final -->
+                <div class="card p-6 bg-slate-800/50 opacity-70">
+                    <h3 class="text-lg font-bold text-slate-500">Proyecto Final</h3>
+                     <p class="text-sm text-slate-400 mb-4">Próximamente</p>
+                     <div class="flex items-center space-x-4 text-slate-500">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                         </svg>
+                        <p class="text-lg font-bold">Aún no se han solicitado entregables.</p>
+                    </div>
+                     <div class="mt-4 pt-4 border-t border-slate-700">
+                         <p class="text-sm text-slate-300">Este será el culmen de tu aprendizaje. ¡Prepárate para un gran reto!</p>
+                    </div>
+                </div>
+            </div>
+             <footer class="text-center mt-12 text-slate-500 text-sm">
+                <p>¡Confía en tu talento y sigue adelante! El éxito en este exigente diplomado está a tu alcance.</p>
+            </footer>
+        </div>
+    </div>
+    
+    <!-- Modal Coordinación -->
+    <div id="coord-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden modal-backdrop">
+        <div class="bg-slate-800 border border-slate-700 rounded-lg shadow-xl p-6 w-full max-w-3xl">
+            <h3 class="text-xl font-bold mb-4">Reporte de Coordinación</h3>
+            <div id="coord-password-section">
+                <label for="coord-password" class="block text-sm font-medium text-slate-300">Contraseña de Coordinación:</label>
+                <input type="password" id="coord-password" class="mt-1 block w-full bg-slate-900 border border-slate-600 rounded-md py-2 px-3 text-white">
+                <button id="coord-login-btn" class="mt-4 w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-md">
+                    Acceder
+                </button>
+            </div>
+            <div id="coord-report-section" class="hidden">
+                 <p id="coord-summary" class="text-sm text-slate-400 mb-4">Cargando reporte...</p>
+                 <div class="max-h-96 overflow-y-auto">
+                    <table class="w-full text-sm text-left text-slate-400">
+                        <thead class="text-xs text-slate-300 uppercase bg-slate-700 sticky top-0">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">Nombre del Campista</th>
+                                <th scope="col" class="px-6 py-3">Estado</th>
+                                <th scope="col" class="px-6 py-3">Última Consulta</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coord-table-body">
+                            <!-- Rows will be generated by JS -->
+                        </tbody>
+                    </table>
+                 </div>
+            </div>
+            <button id="coord-close-btn" class="mt-6 w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-md">
+                Cerrar
+            </button>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Declaración de Variables ---
+            let studentData = [];
+            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyzE87RiJ6grCTb-fLu-n7xgyQmxGCjyz4m9bUYyouOmrjglsG0HckCkbqaluCJXOt4/exec';
+            const STUDENT_PASSWORD = "Soyelmejor2025";
+            const ADMIN_PASSWORD = "Campus2025";
+
+            // --- Elementos del DOM ---
+            const selectionScreen = document.getElementById('selection-screen');
+            const reportScreen = document.getElementById('report-screen');
+            const studentSelect = document.getElementById('student-select');
+            const passwordInput = document.getElementById('password-input');
+            const viewReportBtn = document.getElementById('view-report-btn');
+            const backBtn = document.getElementById('back-btn');
+            const errorMessage = document.getElementById('error-message');
+            const studentEmailEl = document.getElementById('student-email');
+            
+            const coordLink = document.getElementById('coord-link');
+            const coordModal = document.getElementById('coord-modal');
+            const coordCloseBtn = document.getElementById('coord-close-btn');
+            const coordPasswordSection = document.getElementById('coord-password-section');
+            const coordReportSection = document.getElementById('coord-report-section');
+            const coordPasswordInput = document.getElementById('coord-password');
+            const coordLoginBtn = document.getElementById('coord-login-btn');
+            const coordTableBody = document.getElementById('coord-table-body');
+            const coordSummary = document.getElementById('coord-summary');
+
+            // --- Datos de Respaldo ---
+            const fallbackDataCSV = `Código del grupo,ID,Documento,Primer Nombre,Segundo Nombre,Primer Apellido,Segundo Apellido,Correo,Correo Universidad Libre,Celular,F. Inicio,F. Fin,Programa,Cohorte,Estado,Sesiones Ejecutadas,Doc. Cargado,Prueba Entrada,Eje Técnico,Ingles Técnico,Habilidades de Poder,Proyecto Final,Asistencia,% Asistencia,Prueba Salida,Adicional,Coordinador,Estado del Grupo
+R7-L2-IA-B-V-JN-G2037,66607,39743855,AFFRA,MILENA,GOMEZ,ORTIZ,affragomez@gmail.com,affra.gomez.ttb.855@unilibre.edu.co,3144573483,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,58.33,0,0,0,0,27,87.1,96,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66001,1073154359,ANA,MILENA,SUESCUN,GARZON,anamil@iejuanluislondono.edu.co,ana.suescun.ttb.359@unilibre.edu.co,3138018346,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,3,1,0,0,28,90.32,100,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65998,1072642622,ANDREA,DEL PILAR,RODRIGUEZ,GUERRERO,andrero@unisabana.edu.co,andrea.rodriguez.ttb.622@unilibre.edu.co,3132953216,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,3,1,0,0,28,90.32,96,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65860,1144141675,ANDRES,FELIPE,LOPEZ,MENESES,aflopezm1@gmail.com,andres.lopez.ttc.675@unilibre.edu.co,3142996525,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,3,1,0,0,30,96.77,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,59296,1003659774,ANGYE,ALEJANDRA,QUIROGA,AVILA,angyealejandra@gmail.com,angye.quiroga.ttc.774@unilibre.edu.co,3213560661,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,0,0,0,0,7,22.58,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65715,1030616113,BRAYAN,STEVEN,RODRIGUEZ,RAMIREZ,brayan.srr@hotmail.com,brayan.rodriguez.ttc.113@unilibre.edu.co,3003056345,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,3,1,0,0,23,74.19,84,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,68461,30328727,CAROLINA,,OSPINA,MARTINEZ,caroosma1985@gmail.com,carolina.ospina.ttc.727@unilibre.edu.co,3202952864,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,4.17,0,0,0,0,5,16.13,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66038,1032442436,DANIEL,FELIPE,GARZON,PEÑA,dfgarzonp@correo.udistrital.edu.co,daniel.garzon.ttc.436@unilibre.edu.co,3133279147,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,3,1,0,0,21,67.74,88,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65747,1024513685,DEYBY,JHOAN,LEON,CARRILLO,deybyjhoan@gmail.com,deyby.leon.ttc.685@unilibre.edu.co,3138865612,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,0,0,0,0,22,70.97,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65036,52365338,DIANA,MARCELA,DEVIA,VALDERRAMA,dianamarceladeviavalderrama@gmail.com,diana.devia.ttc.338@unilibre.edu.co,3203956697,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,0,0,0,0,4,12.9,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65543,1010078714,DIEGO,ARMANDO,MORA,ROBAYO,damorar@uninorte.edu.co,diego.mora.ttc.714@unilibre.edu.co,3013892395,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,1,1,0,0,21,67.74,80,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65596,40879230,ELIZABETH,MARIA,GONZALEZ,IPUANA,wayuu1982@gmail.com,elizabeth.gonzalez.ttc.230@unilibre.edu.co,3135058768,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,6,2,0,0,21,67.74,96,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66191,1022982881,FABIAN,HUMBERTO,PEREZ,ROJAS,fabianperez8912@gmail.com,fabian.perez.ttc.881@unilibre.edu.co,3107986278,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,3,1,0,0,26,83.87,84,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65841,80101070,FERNANDO,JOSE,RINCON,CORRALES,fernandofido@gmail.com,fernando.rincon.ttb.070@unilibre.edu.co,3176422156,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,4,0,1,0,25,80.65,96,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65686,46375764,GIOVANA,ALEXANDRA,RODRIGUEZ,GUANUME,giovanar@gmail.com,giovana.rodriguez.ttc.764@unilibre.edu.co,3203157973,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,3,1,0,0,28,90.32,100,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,61021,1049614167,GUSTAVO,ANDRES,RODRIGUEZ,PUERTO,gustavoroq@hotmail.com,gustavo.rodriguez.ttc.167@unilibre.edu.co,3105586488,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,0,0,0,0,4,12.9,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66367,1018501235,HECTOR,FABIO,ROJAS,ROJAS,hfrojasp@gmail.com,hector.rojas.ttc.235@unilibre.edu.co,3115020581,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,2,1,0,0,27,87.1,92,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66068,1001150044,JEFFERSON,DAVID,PERALTA,GARZON,jeffer.peralta@hotmail.com,jefferson.peralta.ttc.044@unilibre.edu.co,3223015509,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,2,1,0,0,24,77.42,96,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66311,1015442531,JHON,ALEXANDER,GUERRERO,RODRIGUEZ,jhonguerrero199@gmail.com,jhon.guerrero.ttc.531@unilibre.edu.co,3133606997,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,0,0,0,0,9,29.03,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,64571,1121852654,JORGE,ARMANDO,RIOS,GOMEZ,jorge.rios@unillanos.edu.co,jorge.rios.ttc.654@unilibre.edu.co,3214303350,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,2,1,0,0,29,93.55,88,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66219,1030656091,JOSE,DAVID,CHACON,FUQUEN,davidchacon0326@gmail.com,jose.chacon.ttc.091@unilibre.edu.co,3102555755,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,2,1,0,0,26,83.87,88,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65624,1110468087,JOSE,LUIS,PEREZ,PEREZ,joselperez@unipamplona.edu.co,jose.perez.ttc.087@unilibre.edu.co,3185360980,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,0,0,0,0,9,29.03,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65714,1072641174,JUAN,ANDRES,CASTIBLANCO,GUAUQUE,andresguauque@gmail.com,juan.castiblanco.ttc.174@unilibre.edu.co,3107875791,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,4.17,1,0,0,0,2,6.45,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66249,1010196881,JUAN,ESTEBAN,CARVAJAL,GUTIERREZ,juanes.carvajal@usantoto.edu.co,juan.carvajal.ttc.881@unilibre.edu.co,3153545695,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,3,1,0,0,25,80.65,96,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,64272,7188279,JUAN,PABLO,ACERO,AYALA,juan.acero@iesr.edu.co,juan.acero.ttb.279@unilibre.edu.co,3143326983,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,0,0,0,0,,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,64466,1049647158,KAREN,DANIELA,CUERVO,CELY,karendcely@gmail.com,karen.cuervo.ttc.158@unilibre.edu.co,3108643210,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,3,1,0,0,28,90.32,100,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66391,1018449079,LAURA,CAMILA,LOPEZ,AREVALO,lauracamila753@gmail.com,laura.lopez.ttc.079@unilibre.edu.co,3103444431,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,3,1,0,0,27,87.1,96,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,61059,1049638178,LAURA,TATIANA,BUITRAGO,RODRIGUEZ,laubuitrago30@hotmail.com,laura.buitrago.ttb.178@unilibre.edu.co,3138608604,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,0,0,0,0,,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,64575,1054679957,LAURA,YISED,RAMOS,CASTELBLANCO,laura.y.ramos.c@gmail.com,laura.ramos.ttc.957@unilibre.edu.co,3125219213,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,3,1,0,0,28,90.32,92,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66046,52481856,LIGIA,ANDREA,NARANJO,CHAVARRO,ligiaanaranjo@gmail.com,ligia.naranjo.ttc.856@unilibre.edu.co,3115049397,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,3,0,0,0,28,90.32,92,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66504,52664576,LILIANA,MARITZA,RUIZ,RIVAS,lilianamrr@gmail.com,liliana.ruiz.ttc.576@unilibre.edu.co,3102636474,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,3,1,0,0,28,90.32,92,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65942,52719515,MARIA,DEL PILAR,PEREZ,CASTILLO,maperezcas@gmail.com,maria.perez.ttc.515@unilibre.edu.co,3138318181,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,3,1,0,0,24,77.42,92,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65887,1016082989,MARIA,FERNANDA,ALFONSO,ROJAS,mafe1409.2@gmail.com,maria.alfonso.ttc.989@unilibre.edu.co,3142750645,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,1,0,0,0,19,61.29,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65772,40034709,MARIA,INES,PUERTO,HURTADO,mariaipuerto@gmail.com,maria.puerto.ttc.709@unilibre.edu.co,3118420914,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,4.17,3,1,0,0,28,90.32,100,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66168,1013628456,MIGUEL,ANGEL,PARRA,MORENO,miguel.parra@usantoto.edu.co,miguel.parra.ttc.456@unilibre.edu.co,3193233519,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,1,1,0,0,25,80.65,100,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66107,1014237596,NICOLAS,ANDRES,GUTIERREZ,REYES,nicolasandresgutierrezreyes@gmail.com,nicolas.gutierrez.ttc.596@unilibre.edu.co,3187079361,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,3,1,0,0,29,93.55,92,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66144,1016024921,OSCAR,JAVIER,MORENO,GARCIA,oscarjavier210@hotmail.com,oscar.moreno.ttc.921@unilibre.edu.co,3118939223,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,3,1,0,0,27,87.1,96,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,64700,1049631527,RAFAEL,LEONARDO,QUIROZ,GOMEZ,rlquirozg@gmail.com,rafael.quiroz.ttc.527@unilibre.edu.co,3114881682,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,4.17,0,0,0,0,,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66252,4151583,ROQUE,ALEXANDER,PINEDA,CASTRO,roque.pineda@usantoto.edu.co,roque.pineda.ttc.583@unilibre.edu.co,3143564032,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,1,0,0,0,27,87.1,92,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65347,11256077,SAMUEL,HERNAN,TOASURA,TORRA,samuelhernantoasura@gmail.com,samuel.toasura.ttc.077@unilibre.edu.co,3132890391,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,0,0,0,0,20,64.52,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66271,46370768,SANDRA,TATIANA,BLANCO,AVELLA,sandratatianablancoavella@gmail.com,sandra.blanco.ttc.768@unilibre.edu.co,3107567794,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,0,0,0,0,11,35.48,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66520,40039234,SANDRA,MILENA,HERNANDEZ,PEREZ,sandramilenah@gmail.com,sandra.hernandez.ttc.234@unilibre.edu.co,3123049818,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,3,1,0,0,28,90.32,96,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65653,1023924760,SERGIO,ALEJANDRO,VARGAS,PARRA,sergiovargasparra@hotmail.com,sergio.vargas.ttc.760@unilibre.edu.co,3102874136,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,1,0,0,0,22,70.97,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65973,46671969,YAKELINE,,SANCHEZ,YARA,yasaya10@yahoo.es,yakeline.sanchez.ttb.969@unilibre.edu.co,3143217736,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,85,3,1,0,0,27,87.1,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,67878,21017961,YAMILE,,SANTOYA,RODRIGUEZ,yamilesantoyarodriguez@gmail.com,yamile.santoya.ttb.961@unilibre.edu.co,3112449895,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,33.33,0,0,0,0,22,70.97,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65910,1022359695,YEISON,ALEXANDER,ALVAREZ,ALVAREZ,yeison-2011@hotmail.com,yeison.alvarez.ttc.695@unilibre.edu.co,3132626940,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,3,1,0,0,27,87.1,96,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,67323,1016075191,YEISON,FERNANDO,CASTILLO,GUAYABO,castillo.yeison@gmail.com,yeison.castillo.ttc.191@unilibre.edu.co,3112595604,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,0,0,0,0,3,9.68,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,65538,1032470650,YULI,ANDREA,GOMEZ,QUINTERO,yuligo14@gmail.com,yuli.gomez.ttc.650@unilibre.edu.co,3114995736,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,0,0,0,0,1,3.23,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66018,1143355502,CARLOS,MARIO,OSPINA,LOPEZ,carlosmario.ospina@udea.edu.co,carlos.ospina.ttb.502@unilibre.edu.co,3013862211,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,0,0,0,0,1,3.23,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66289,1015433013,CARLOS,ANDRES,RAMIREZ,MONROY,carami2@hotmail.com,carlos.ramirez.ttb.013@unilibre.edu.co,3112108573,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,0,0,0,0,2,6.45,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66324,1030614534,CESAR,ALEXIS,ALFONSO,ROJAS,cesarojas92@hotmail.com,cesar.alfonso.ttb.534@unilibre.edu.co,3213155829,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,0,0,0,0,2,6.45,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66355,80838321,CRISTHIAN,CAMILO,GARZON,MORENO,ccgarzonm@correo.udistrital.edu.co,cristhian.garzon.ttb.321@unilibre.edu.co,3102604859,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,0,0,0,0,2,6.45,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66360,1032441999,DANIEL,ALEJANDRO,VARGAS,RAMOS,dalejovr@gmail.com,daniel.vargas.ttb.999@unilibre.edu.co,3112255476,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,4.17,0,0,0,0,2,6.45,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66579,1010214894,DEISY,JOHANNA,CRUZ,CASTILLO,deisyjohannacruz@gmail.com,deisy.cruz.ttb.894@unilibre.edu.co,3115488732,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,0,0,0,0,2,6.45,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66687,1019056649,DIEGO,ARMANDO,ROBAYO,RAMIREZ,darobayor@libertadores.edu.co,diego.robayo.ttb.649@unilibre.edu.co,3102604859,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,4.17,0,0,0,0,2,6.45,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66749,1077464042,EDWIN,FABIAN,ROJAS,CORREDOR,efrojascorredor@gmail.com,edwin.rojas.ttb.042@unilibre.edu.co,3112595604,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,4.17,0,0,0,0,2,6.45,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66755,1018442220,EIMY,KATHERINE,GUTIERREZ,REYES,eimykgr@gmail.com,eimy.gutierrez.ttb.220@unilibre.edu.co,3114995736,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,4.17,0,0,0,0,2,6.45,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66826,1016027606,ERIKA,YULIANA,GARCIA,LEON,erikayulianagarcia@gmail.com,erika.garcia.ttb.606@unilibre.edu.co,3013862211,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,0,0,0,0,2,6.45,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66864,1013627885,FABIAN,LEONARDO,MORA,ROBAYO,fabianmora5@hotmail.com,fabian.mora.ttb.885@unilibre.edu.co,3112108573,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,0,0,0,0,2,6.45,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,67140,1032454687,HEIDY,JOHANA,GUERRERO,RODRIGUEZ,heidy-johana@hotmail.com,heidy.guerrero.ttb.687@unilibre.edu.co,3213155829,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,0,0,0,0,2,6.45,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,67329,1022378393,HERNAN,DARIO,PIRAQUIVE,RICO,hd-pr@hotmail.com,hernan.piraquive.ttb.393@unilibre.edu.co,3102604859,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,4.17,0,0,0,0,2,6.45,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,67332,1013632420,HECTOR,ALFONSO,RODRIGUEZ,RAMIREZ,harodriguezr@libertadores.edu.co,hector.rodriguez.ttb.420@unilibre.edu.co,3112255476,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,4.17,0,0,0,0,3,9.68,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,67668,1032409740,INGRID,TATIANA,GOMEZ,QUINTERO,ingridtatianagomez@gmail.com,ingrid.gomez.ttb.740@unilibre.edu.co,3115488732,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,4.17,0,0,0,0,3,9.68,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,67683,1010191834,ISABELLA,,RAMIREZ,MONROY,isabella.ramirez@udea.edu.co,isabella.ramirez.ttb.834@unilibre.edu.co,3102604859,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,0,0,0,0,3,9.68,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,67733,1018449079,IVAN,CAMILO,LOPEZ,AREVALO,ivanlopez1992@hotmail.com,ivan.lopez.ttb.079@unilibre.edu.co,3112595604,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,0,0,0,0,3,9.68,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,67789,1030614534,JAIRO,ALEXIS,ALFONSO,ROJAS,jairo.alfonso@hotmail.com,jairo.alfonso.ttb.534@unilibre.edu.co,3114995736,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,0,0,0,0,3,9.68,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,67850,1016027606,JAVIER,ANDRES,GARCIA,LEON,jagarcial@libertadores.edu.co,javier.garcia.ttb.606@unilibre.edu.co,3013862211,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,0,0,0,0,3,9.68,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,67879,1032454687,JESSICA,JOHANA,GUERRERO,RODRIGUEZ,jessica.johana.guerrero@gmail.com,jessica.guerrero.ttb.687@unilibre.edu.co,3112108573,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,0,0,0,0,3,9.68,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,67912,1022378393,JHON,DARIO,PIRAQUIVE,RICO,jd-pr@hotmail.com,jhon.piraquive.ttb.393@unilibre.edu.co,3213155829,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,0,0,0,0,3,9.68,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,67915,1010214894,JHONATAN,DEISY,CRUZ,CASTILLO,jhonatan.cruz@hotmail.com,jhonatan.cruz.ttb.894@unilibre.edu.co,3102604859,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,4.17,0,0,0,0,4,12.9,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,67954,1019056649,JOHN,ARMANDO,ROBAYO,RAMIREZ,jarobayor@libertadores.edu.co,john.robayo.ttb.649@unilibre.edu.co,3112255476,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,4.17,0,0,0,0,4,12.9,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,68045,1077464042,JORGE,FABIAN,ROJAS,CORREDOR,jorge.rojas@udea.edu.co,jorge.rojas.ttb.042@unilibre.edu.co,3115488732,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,0,0,0,0,4,12.9,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,68048,1018442220,JOSE,KATHERINE,GUTIERREZ,REYES,jose.gutierrez@hotmail.com,jose.gutierrez.ttb.220@unilibre.edu.co,3102604859,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,4.17,0,0,0,0,4,12.9,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,68249,1016027606,JUAN,YULIANA,GARCIA,LEON,juan.garcia@gmail.com,juan.garcia.ttb.606@unilibre.edu.co,3112595604,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,0,0,0,0,4,12.9,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,68305,1013627885,JUAN,LEONARDO,MORA,ROBAYO,juan.mora@hotmail.com,juan.mora.ttb.885@unilibre.edu.co,3114995736,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,0,0,0,0,4,12.9,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,68434,1032454687,JULIAN,JOHANA,GUERRERO,RODRIGUEZ,julian.guerrero@hotmail.com,julian.guerrero.ttb.687@unilibre.edu.co,3013862211,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,0,0,0,0,4,12.9,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,68541,1022378393,JULIO,DARIO,PIRAQUIVE,RICO,jd-pr@hotmail.com,julio.piraquive.ttb.393@unilibre.edu.co,3112108573,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,0,0,0,0,4,12.9,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66598,1015442531,JHON,ALEXANDER,FERNANDEZ,BARRERA,jhon.fernandez@hotmail.com,jhon.fernandez.ttb.531@unilibre.edu.co,3213155829,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,41.67,0,0,0,0,9,29.03,,No,COORDINADOR R7L2,En Formación
+R7-L2-IA-B-V-JN-G2037,66277,1069753435,JUAN,SEBASTIAN,MARTINEZ,RIVERA,juan.martinez@udea.edu.co,juan.martinez.ttb.435@unilibre.edu.co,3102604859,2025-07-28 00:00:00,2025-10-20 00:00:00,Inteligencia Artificial,2,En Formación,31,Sí,25,0,0,0,0,5,16.13,,No,COORDINADOR R7L2,En Formación`;
+            
+            // --- Cargar y procesar datos ---
+            function parseCSV(text, delimiter = ',') {
+                const lines = text.split(/[\r\n]+/).filter(line => line.trim() !== '');
+                if (lines.length < 2) return [];
+                const headers = lines[0].split(delimiter).map(h => h.trim().replace(/"/g, ''));
+                const data = [];
+                for (let i = 1; i < lines.length; i++) {
+                    const values = lines[i].split(delimiter);
+                    if (values.length < headers.length) continue; 
+                    const entry = {};
+                    headers.forEach((header, index) => {
+                        if (header) {
+                            entry[header] = values[index] ? values[index].trim().replace(/"/g, '') : '';
+                        }
+                    });
+                    data.push(entry);
+                }
+                return data;
+            }
+            
+            function populateStudentDropdown(data) {
+                const totalSessions = data.reduce((max, row) => {
+                    const attendanceCount = parseInt(row['Asistencia'] || 0, 10);
+                    return attendanceCount > max ? attendanceCount : max;
+                }, 0);
+
+                studentData = data.map(row => {
+                    const attendanceCount = parseInt(row['Asistencia'] || 0, 10);
+                    const attendancePercent = totalSessions > 0 ? (attendanceCount / totalSessions) * 100 : 0;
+                    return {
+                        id: row['ID'],
+                        fullName: `${row['Primer Nombre']} ${row['Segundo Nombre'] || ''} ${row['Primer Apellido']} ${row['Segundo Apellido'] || ''}`.replace(/\s+/g, ' ').trim(),
+                        email: row['Correo'] || 'Correo no disponible',
+                        technicalActivities: parseInt(row['Eje Técnico'] || 0, 10),
+                        englishActivities: parseInt(row['Ingles Técnico'] || 0, 10),
+                        powerSkills: parseInt(row['Habilidades de Poder'] || 0, 10),
+                        finalProject: parseInt(row['Proyecto Final'] || 0, 10),
+                        attendanceCount: attendanceCount,
+                        attendancePercent: attendancePercent
+                    };
+                }).sort((a, b) => a.fullName.localeCompare(b.fullName));
+
+                studentSelect.innerHTML = '<option value="">-- Por favor, selecciona tu nombre --</option>';
+                studentData.forEach((student, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = student.fullName;
+                    studentSelect.appendChild(option);
+                });
+            }
+
+            function createCircularProgress(elementId, value, target, color) {
+                const container = document.getElementById(elementId);
+                let percentage = target > 0 ? (value / target) * 100 : (value > 0 ? 100 : 0);
+                if (percentage > 100) percentage = 100;
+
+                container.innerHTML = `
+                    <svg class="w-full h-full" viewBox="0 0 36 36">
+                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#334155" stroke-width="3" />
+                        <path class="progress-circle" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="${color}" stroke-width="3" stroke-dasharray="100, 100" stroke-dashoffset="${100 - percentage}" stroke-linecap="round" />
+                    </svg>`;
+            }
+
+            function displayStudentReport(student) {
+                document.getElementById('student-name').textContent = student.fullName;
+                studentEmailEl.textContent = student.email;
+                
+                const techTarget = 3;
+                const englishTarget = 1;
+                const isUpToDate = student.technicalActivities >= techTarget && student.englishActivities >= englishTarget;
+                
+                const messageBox = document.getElementById('general-message-box');
+                const messageTitle = document.getElementById('general-message-title');
+                const messageText = document.getElementById('general-message-text');
+
+                if (isUpToDate) {
+                    messageBox.className = 'bg-teal-900/50 border border-teal-700 text-teal-200 px-4 py-3 rounded-lg relative mb-8';
+                    messageTitle.textContent = '¡Felicidades, vas por excelente camino!';
+                    messageText.textContent = 'Has cumplido con todas las actividades hasta la fecha. Tu dedicación y esfuerzo son notables. ¡Sigue así!';
+                } else if (student.attendancePercent > 75) {
+                    messageBox.className = 'bg-yellow-900/50 border border-yellow-700 text-yellow-200 px-4 py-3 rounded-lg relative mb-8';
+                    messageTitle.textContent = '¡Estás muy cerca de la meta!';
+                    messageText.textContent = 'Tu excelente asistencia demuestra un gran compromiso. Solo te falta ponerte al día con las actividades para tener un progreso ideal. ¡No bajes el ritmo ahora!';
+                } else if (student.attendancePercent > 71) {
+                    messageBox.className = 'bg-sky-900/50 border border-sky-800 text-sky-200 px-4 py-3 rounded-lg relative mb-8';
+                    messageTitle.textContent = '¡Buenas noticias!';
+                    messageText.textContent = 'La coordinación del BootCamp aprobó la homologación de la no asistencia a algunas sesiones si te pones al día con las actividades. ¡Aún tienes la oportunidad de alcanzar todos los objetivos!';
+                } else {
+                    messageBox.className = 'bg-slate-700/80 border border-slate-600 text-slate-300 px-4 py-3 rounded-lg relative mb-8';
+                    messageTitle.textContent = '¡Sigue adelante!';
+                    messageText.textContent = 'Sabemos que este diplomado es exigente. Valora el gran esfuerzo y tiempo que has dedicado. ¡Cada paso que das te acerca a la meta!';
+                }
+                
+                let techStatus, techAnalysis, techColor;
+                if (student.technicalActivities > techTarget) {
+                    techStatus = 'Adelantado';
+                    techAnalysis = `¡Excelente trabajo! Has completado más actividades de las esperadas. Vas por un camino excepcional. ¡Felicitaciones!`;
+                    techColor = '#22c55e';
+                } else if (student.technicalActivities === techTarget) {
+                    techStatus = 'Al día';
+                    techAnalysis = `¡Muy bien! Estás al día con todas las actividades del eje técnico. Sigue con esa constancia y disciplina.`;
+                    techColor = '#38bdf8';
+                } else {
+                    techStatus = 'Atrasado';
+                    techAnalysis = `Vas un poco atrás, ¡pero no te desanimes! Aún estás a tiempo de ponerte al día. Organiza tu tiempo y enfócate en las entregas pendientes. ¡Tú puedes!`;
+                    techColor = '#facc15';
+                }
+                document.getElementById('tech-status').textContent = techStatus;
+                document.getElementById('tech-status').style.color = techColor;
+                document.getElementById('tech-activities').textContent = `${student.technicalActivities} de ${techTarget} entregadas`;
+                document.getElementById('tech-analysis').textContent = techAnalysis;
+                createCircularProgress('tech-progress', student.technicalActivities, techTarget, techColor);
+
+                let englishStatus, englishAnalysis, englishColor;
+                 if (student.englishActivities > englishTarget) {
+                    englishStatus = 'Adelantado';
+                    englishAnalysis = `¡Impresionante! Ya te has adelantado en las actividades de inglés. Este esfuerzo extra te dará grandes ventajas.`;
+                    englishColor = '#22c55e';
+                } else if (student.englishActivities === englishTarget) {
+                    englishStatus = 'Al día';
+                    englishAnalysis = `Perfecto, tienes la actividad de inglés requerida. El dominio del inglés técnico es clave para tu futuro profesional.`;
+                    englishColor = '#2dd4bf';
+                } else {
+                    englishStatus = 'Atrasado';
+                    englishAnalysis = `Falta tu entrega de inglés. Es una sola actividad, ¡puedes hacerla rápidamente! No dejes que se acumule.`;
+                    englishColor = '#facc15';
+                }
+                document.getElementById('english-status').textContent = englishStatus;
+                document.getElementById('english-status').style.color = englishColor;
+                document.getElementById('english-activities').textContent = `${student.englishActivities} de ${englishTarget} entregada`;
+                document.getElementById('english-analysis').textContent = englishAnalysis;
+                createCircularProgress('english-progress', student.englishActivities, englishTarget, englishColor);
+                
+                const attendancePercent = student.attendancePercent;
+                const attendanceCircle = document.getElementById('attendance-circle');
+                const attendancePercentText = document.getElementById('attendance-percent');
+                
+                attendancePercentText.textContent = `${attendancePercent.toFixed(1)}%`;
+                const offset = 100 - attendancePercent;
+                attendanceCircle.style.strokeDashoffset = offset;
+
+                let attendanceStatus, attendanceAnalysis, attendanceColor;
+                if (attendancePercent >= 80) {
+                    attendanceStatus = "Excelente";
+                    attendanceAnalysis = "¡Felicitaciones por tu alto compromiso! Tu constancia en las sesiones es un pilar fundamental para tu éxito en el diplomado.";
+                    attendanceColor = '#a78bfa';
+                } else if (attendancePercent >= 60) {
+                    attendanceStatus = "Buena";
+                    attendanceAnalysis = "Tienes una buena asistencia. Sigue así y no faltes a las próximas sesiones para aprovechar todo el contenido.";
+                    attendanceColor = '#60a5fa';
+                } else {
+                    attendanceStatus = "Baja";
+                    attendanceAnalysis = "Tu asistencia es baja. Recuerda que puedes compensar las faltas poniéndote al día con las actividades. ¡No te rindas ahora!";
+                    attendanceColor = '#f59e0b';
+                }
+
+                document.getElementById('attendance-status').textContent = attendanceStatus;
+                document.getElementById('attendance-sessions').textContent = `${student.attendanceCount} sesiones asistidas`;
+                document.getElementById('attendance-analysis').textContent = attendanceAnalysis;
+                attendanceCircle.style.stroke = attendanceColor;
+                document.getElementById('attendance-status').style.color = attendanceColor;
+
+                selectionScreen.classList.add('hidden');
+                reportScreen.classList.remove('hidden');
+            }
+            
+            async function loadInitialData() {
+                if (SCRIPT_URL === 'PEGA_AQUÍ_LA_URL_DE_TU_SCRIPT') {
+                    errorMessage.textContent = 'La aplicación no está configurada. Por favor, sigue las instrucciones para conectar con Google Sheets.';
+                    errorMessage.classList.remove('hidden');
+                    return;
+                }
+                try {
+                    const response = await fetch(`${SCRIPT_URL}?action=getStudents`);
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const data = await response.json();
+                    if (data.error) throw new Error(JSON.stringify(data.error));
+                    populateStudentDropdown(data);
+                } catch (error) {
+                    console.error('Fallo al cargar datos desde Google Sheets:', error);
+                    errorMessage.textContent = 'No se pudieron cargar los datos desde Google. Cargando datos de respaldo.';
+                    errorMessage.classList.remove('hidden');
+                    try {
+                        const data = parseCSV(fallbackDataCSV);
+                        populateStudentDropdown(data);
+                    } catch (fallbackError) {
+                        console.error('Error al procesar los datos de respaldo:', fallbackError);
+                        errorMessage.textContent = 'Error crítico: Los datos de respaldo no se pudieron cargar.';
+                    }
+                }
+            }
+
+            async function generateCoordinationReport() {
+                coordSummary.textContent = 'Cargando reporte...';
+                coordTableBody.innerHTML = '';
+
+                try {
+                    const response = await fetch(`${SCRIPT_URL}?action=getCoordReport`);
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    
+                    const reportData = await response.json();
+                    if(reportData.error) throw new Error(JSON.stringify(reportData.error));
+                    
+                    let reviewedCount = 0;
+                    
+                    studentData.forEach(student => {
+                        const reviewInfo = reportData[student.id];
+                        const status = reviewInfo ? 'Revisado' : 'Sin revisar';
+                        const timestamp = reviewInfo ? reviewInfo.timestamp : 'N/A';
+                        
+                        if (reviewInfo) reviewedCount++;
+
+                        const row = document.createElement('tr');
+                        row.className = 'bg-slate-800 border-b border-slate-700';
+                        row.innerHTML = `
+                            <td class="px-6 py-4 font-medium text-white">${student.fullName}</td>
+                            <td class="px-6 py-4">
+                                <span class="${status === 'Revisado' ? 'text-green-400' : 'text-yellow-400'}">${status}</span>
+                            </td>
+                            <td class="px-6 py-4">${timestamp}</td>
+                        `;
+                        coordTableBody.appendChild(row);
+                    });
+
+                    coordSummary.textContent = `Total de campistas: ${studentData.length}. Han revisado el informe: ${reviewedCount}.`;
+
+                } catch (error) {
+                    console.error('Fallo al cargar el reporte de coordinación:', error);
+                    coordSummary.textContent = 'No se pudo cargar el reporte. Revisa la conexión o el script.';
+                }
+            }
+            
+            // --- Event Listeners ---
+            viewReportBtn.addEventListener('click', () => {
+                const selectedIndex = studentSelect.value;
+                const enteredPassword = passwordInput.value;
+
+                if (studentSelect.value === "") {
+                    errorMessage.textContent = 'Por favor, selecciona tu nombre.';
+                    errorMessage.classList.remove('hidden');
+                    return;
+                }
+                if (enteredPassword !== STUDENT_PASSWORD) {
+                    errorMessage.textContent = 'Contraseña incorrecta. Inténtalo de nuevo.';
+                    errorMessage.classList.remove('hidden');
+                    return;
+                }
+                
+                errorMessage.classList.add('hidden');
+                const student = studentData[selectedIndex];
+                
+                try {
+                    const timestamp = new Date().toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'medium' });
+                    const reportData = {
+                        id: student.id,
+                        fullName: student.fullName,
+                        timestamp: timestamp,
+                    };
+                    
+                    fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(reportData),
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                             console.log('Respuesta de guardado:', data.message)
+                        } else {
+                            throw new Error(data.error);
+                        }
+                    })
+                    .catch(err => {
+                        console.warn('No se pudo guardar el reporte en Google Sheets. El acceso funcionará, pero el reporte de coordinación no se actualizará.', err);
+                    });
+
+                } catch(e) {
+                    console.error("Fallo al enviar el estado de revisión:", e);
+                }
+
+                displayStudentReport(student);
+            });
+
+            backBtn.addEventListener('click', () => {
+                reportScreen.classList.add('hidden');
+                selectionScreen.classList.remove('hidden');
+                passwordInput.value = '';
+                studentSelect.value = '';
+            });
+            
+            coordLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                coordModal.classList.remove('hidden');
+                coordReportSection.classList.add('hidden');
+                coordPasswordSection.classList.remove('hidden');
+                coordPasswordInput.value = '';
+            });
+
+            coordCloseBtn.addEventListener('click', () => {
+                coordModal.classList.add('hidden');
+            });
+
+            coordLoginBtn.addEventListener('click', () => {
+                if (coordPasswordInput.value === ADMIN_PASSWORD) {
+                    coordPasswordSection.classList.add('hidden');
+                    coordReportSection.classList.remove('hidden');
+                    generateCoordinationReport();
+                } else {
+                    alert('Contraseña de coordinación incorrecta.');
+                }
+            });
+
+            // --- Carga inicial ---
+            loadInitialData();
+        });
+    </script>
+</body>
+</html>
+
