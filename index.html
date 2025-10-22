@@ -40,7 +40,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <h1 class="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">Informe de Progreso del Diplomado</h1>
-            <p class="mt-2 text-lg text-slate-400">Fecha del Reporte: 26 de septiembre de 2025</p>
+            <p class="mt-2 text-lg text-slate-400">Fecha del Reporte: 22 de octubre de 2025</p>
             
             <div class="mt-8 space-y-4 text-left p-8 bg-slate-800 rounded-xl shadow-2xl border border-slate-700">
                 <div>
@@ -161,32 +161,55 @@
                 </div>
 
                 <!-- Habilidades de Poder -->
-                <div class="card p-6 bg-slate-800/50 opacity-70">
-                    <h3 class="text-lg font-bold text-slate-500">Habilidades de Poder</h3>
-                    <p class="text-sm text-slate-400 mb-4">Próximamente</p>
-                     <div class="flex items-center space-x-4 text-slate-500">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <p class="text-lg font-bold">Aún no se han solicitado entregables.</p>
+                <div class="card p-6">
+                    <h3 class="text-lg font-bold text-amber-400">Habilidades de Poder</h3>
+                    <p class="text-sm text-slate-400 mb-4">Actividad Entregable</p>
+                    <div class="flex items-center space-x-4">
+                        <div id="power-progress" class="w-16 h-16"></div>
+                        <div>
+                            <p id="power-status" class="text-xl font-bold"></p>
+                            <p id="power-activities" class="text-slate-300"></p>
+                        </div>
                     </div>
                     <div class="mt-4 pt-4 border-t border-slate-700">
-                        <p class="text-sm text-slate-300">Mantente atento a las próximas comunicaciones sobre este módulo.</p>
+                        <p class="text-sm font-semibold mb-1">Análisis:</p>
+                        <p id="power-analysis" class="text-sm text-slate-300"></p>
                     </div>
                 </div>
 
                 <!-- Proyecto Final -->
-                <div class="card p-6 bg-slate-800/50 opacity-70">
-                    <h3 class="text-lg font-bold text-slate-500">Proyecto Final</h3>
-                     <p class="text-sm text-slate-400 mb-4">Próximamente</p>
-                     <div class="flex items-center space-x-4 text-slate-500">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                         </svg>
-                        <p class="text-lg font-bold">Aún no se han solicitado entregables.</p>
+                <div class="card p-6">
+                    <h3 class="text-lg font-bold text-indigo-400">Proyecto Final</h3>
+                    <p class="text-sm text-slate-400 mb-4">Actividad Entregable</p>
+                    <div class="flex items-center space-x-4">
+                        <div id="project-progress" class="w-16 h-16"></div>
+                        <div>
+                            <p id="project-status" class="text-xl font-bold"></p>
+                            <p id="project-activities" class="text-slate-300"></p>
+                        </div>
                     </div>
-                     <div class="mt-4 pt-4 border-t border-slate-700">
-                         <p class="text-sm text-slate-300">Este será el culmen de tu aprendizaje. ¡Prepárate para un gran reto!</p>
+                    <!-- INICIO DE LA CORRECCIÓN -->
+                    <div class="mt-4 pt-4 border-t border-slate-700">
+                        <p class="text-sm font-semibold mb-1">Análisis:</p>
+                        <p id="project-analysis" class="text-sm text-slate-300"></p>
+                    </div>
+                    <!-- FIN DE LA CORRECCIÓN -->
+                </div>
+
+                <!-- Prueba Final (NUEVO MODULO) -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-bold text-lime-400">Prueba Final</h3>
+                    <p class="text-sm text-slate-400 mb-4">Puntaje Obtenido</p>
+                    <div class="flex items-center space-x-4">
+                        <div id="final-test-progress" class="w-16 h-16"></div>
+                        <div>
+                            <p id="final-test-status" class="text-xl font-bold"></p>
+                            <p id="final-test-score" class="text-slate-300"></p>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-slate-700">
+                        <p class="text-sm font-semibold mb-1">Análisis:</p>
+                        <p id="final-test-analysis" class="text-sm text-slate-300"></p>
                     </div>
                 </div>
             </div>
@@ -378,6 +401,7 @@ R7-L2-IA-B-V-JN-G2037,66277,1069753435,JUAN,SEBASTIAN,MARTINEZ,RIVERA,juan.marti
                         englishActivities: parseInt(row['Ingles Técnico'] || 0, 10),
                         powerSkills: parseInt(row['Habilidades de Poder'] || 0, 10),
                         finalProject: parseInt(row['Proyecto Final'] || 0, 10),
+                        finalTestScore: parseFloat(row['Prueba Salida'] || 0, 10),
                         attendanceCount: attendanceCount,
                         attendancePercent: attendancePercent
                     };
@@ -408,9 +432,17 @@ R7-L2-IA-B-V-JN-G2037,66277,1069753435,JUAN,SEBASTIAN,MARTINEZ,RIVERA,juan.marti
                 document.getElementById('student-name').textContent = student.fullName;
                 studentEmailEl.textContent = student.email;
                 
-                const techTarget = 3;
-                const englishTarget = 1;
-                const isUpToDate = student.technicalActivities >= techTarget && student.englishActivities >= englishTarget;
+                // --- ACTUALIZACIÓN DE TOTALES ---
+                const techTarget = 6;
+                const englishTarget = 2;
+                const powerTarget = 1;
+                const projectTarget = 1;
+                
+                // --- ACTUALIZACIÓN DE LÓGICA DE ESTADO ---
+                const isUpToDate = student.technicalActivities >= techTarget && 
+                                   student.englishActivities >= englishTarget && 
+                                   student.powerSkills >= powerTarget && 
+                                   student.finalProject >= projectTarget;
                 
                 const messageBox = document.getElementById('general-message-box');
                 const messageTitle = document.getElementById('general-message-title');
@@ -434,6 +466,7 @@ R7-L2-IA-B-V-JN-G2037,66277,1069753435,JUAN,SEBASTIAN,MARTINEZ,RIVERA,juan.marti
                     messageText.textContent = 'Sabemos que este diplomado es exigente. Valora el gran esfuerzo y tiempo que has dedicado. ¡Cada paso que das te acerca a la meta!';
                 }
                 
+                // --- Eje Técnico ---
                 let techStatus, techAnalysis, techColor;
                 if (student.technicalActivities > techTarget) {
                     techStatus = 'Adelantado';
@@ -454,6 +487,7 @@ R7-L2-IA-B-V-JN-G2037,66277,1069753435,JUAN,SEBASTIAN,MARTINEZ,RIVERA,juan.marti
                 document.getElementById('tech-analysis').textContent = techAnalysis;
                 createCircularProgress('tech-progress', student.technicalActivities, techTarget, techColor);
 
+                // --- Inglés Técnico ---
                 let englishStatus, englishAnalysis, englishColor;
                  if (student.englishActivities > englishTarget) {
                     englishStatus = 'Adelantado';
@@ -461,19 +495,86 @@ R7-L2-IA-B-V-JN-G2037,66277,1069753435,JUAN,SEBASTIAN,MARTINEZ,RIVERA,juan.marti
                     englishColor = '#22c55e';
                 } else if (student.englishActivities === englishTarget) {
                     englishStatus = 'Al día';
-                    englishAnalysis = `Perfecto, tienes la actividad de inglés requerida. El dominio del inglés técnico es clave para tu futuro profesional.`;
+                    englishAnalysis = `Perfecto, tienes las actividades de inglés requeridas. El dominio del inglés técnico es clave para tu futuro profesional.`;
                     englishColor = '#2dd4bf';
                 } else {
                     englishStatus = 'Atrasado';
-                    englishAnalysis = `Falta tu entrega de inglés. Es una sola actividad, ¡puedes hacerla rápidamente! No dejes que se acumule.`;
+                    englishAnalysis = `Faltan tus entregas de inglés. Revisa las actividades pendientes y complétalas pronto.`;
                     englishColor = '#facc15';
                 }
                 document.getElementById('english-status').textContent = englishStatus;
                 document.getElementById('english-status').style.color = englishColor;
-                document.getElementById('english-activities').textContent = `${student.englishActivities} de ${englishTarget} entregada`;
+                document.getElementById('english-activities').textContent = `${student.englishActivities} de ${englishTarget} entregadas`;
                 document.getElementById('english-analysis').textContent = englishAnalysis;
                 createCircularProgress('english-progress', student.englishActivities, englishTarget, englishColor);
+
+                // --- Habilidades de Poder ---
+                let powerStatus, powerAnalysis, powerColor;
+                if (student.powerSkills >= powerTarget) {
+                    powerStatus = 'Al día';
+                    powerAnalysis = `¡Excelente! Has completado la actividad de habilidades de poder. Estas competencias son cruciales para tu perfil profesional.`;
+                    powerColor = '#f59e0b'; // amber-500
+                } else {
+                    powerStatus = 'Pendiente';
+                    powerAnalysis = `Aún tienes pendiente la actividad de habilidades de poder. Es solo una entrega, ¡anímate a completarla pronto!`;
+                    powerColor = '#facc15'; // yellow-400
+                }
+                document.getElementById('power-status').textContent = powerStatus;
+                document.getElementById('power-status').style.color = powerColor;
+                document.getElementById('power-activities').textContent = `${student.powerSkills} de ${powerTarget} entregada`;
+                document.getElementById('power-analysis').textContent = powerAnalysis;
+                createCircularProgress('power-progress', student.powerSkills, powerTarget, powerColor);
+
+                // --- Proyecto Final ---
+                let projectStatus, projectAnalysis, projectColor;
+                if (student.finalProject >= projectTarget) {
+                    projectStatus = 'Al día';
+                    projectAnalysis = `¡Felicidades! Has entregado la actividad correspondiente al proyecto final. Este es un gran hito en tu proceso.`;
+                    projectColor = '#818cf8'; // indigo-400
+                } else {
+                    projectStatus = 'Pendiente';
+                    projectAnalysis = `Tienes pendiente la entrega del proyecto final. Esta es la actividad más importante, ¡dedícale el tiempo necesario!`;
+                    projectColor = '#facc15'; // yellow-400
+                }
+                document.getElementById('project-status').textContent = projectStatus;
+                document.getElementById('project-status').style.color = projectColor;
+                document.getElementById('project-activities').textContent = `${student.finalProject} de ${projectTarget} entregada`;
+                document.getElementById('project-analysis').textContent = projectAnalysis; // Esta era la línea del error
+                createCircularProgress('project-progress', student.finalProject, projectTarget, projectColor);
                 
+                // --- Prueba Final ---
+                const finalTestScore = student.finalTestScore;
+                let testStatus, testAnalysis, testColor;
+                
+                if (finalTestScore === 0) {
+                    testStatus = "Pendiente";
+                    testAnalysis = "Aún no has presentado la prueba final. Esta prueba medirá tu conocimiento consolidado. ¡Prepárate!";
+                    testColor = '#facc15'; // yellow-400
+                } else if (finalTestScore >= 90) {
+                    testStatus = "Destacado";
+                    testAnalysis = `¡Resultado sobresaliente! Tu puntaje de ${finalTestScore} pts demuestra un dominio excepcional del material. ¡Felicidades!`;
+                    testColor = '#84cc16'; // lime-500
+                } else if (finalTestScore >= 80) {
+                    testStatus = "Muy Bueno";
+                    testAnalysis = `¡Gran trabajo! Tu puntaje de ${finalTestScore} pts es excelente y muestra un sólido entendimiento de los temas.`;
+                    testColor = '#22c55e'; // green-500
+                } else if (finalTestScore >= 70) {
+                    testStatus = "Bueno";
+                    testAnalysis = `Buen resultado. Tu puntaje de ${finalTestScore} pts es aprobatorio y demuestra un buen nivel de competencia.`;
+                    testColor = '#38bdf8'; // sky-500
+                } else {
+                    testStatus = "A mejorar";
+                    testAnalysis = `Tu puntaje de ${finalTestScore} pts está por debajo de lo esperado. Te recomendamos repasar los módulos clave.`;
+                    testColor = '#f97316'; // orange-500
+                }
+                
+                document.getElementById('final-test-status').textContent = testStatus;
+                document.getElementById('final-test-status').style.color = testColor;
+                document.getElementById('final-test-score').textContent = `${finalTestScore.toFixed(0)} / 100 pts`;
+                document.getElementById('final-test-analysis').textContent = testAnalysis;
+                createCircularProgress('final-test-progress', finalTestScore, 100, testColor);
+
+                // --- Asistencia ---
                 const attendancePercent = student.attendancePercent;
                 const attendanceCircle = document.getElementById('attendance-circle');
                 const attendancePercentText = document.getElementById('attendance-percent');
